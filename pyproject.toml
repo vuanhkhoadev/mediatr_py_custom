@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mediatr-ez"
-version = "1.0.0"
+version = "1.0.5"
 description = "Mediator project"
 readme = "README.md"
 authors = [{ name = "Anh Khoa", email = "khoava.dev@gmail.com" }]

@@ -1,4 +1,5 @@
 import inspect
+import asyncio
 from typing import Any, Awaitable, Callable, Optional, TypeVar, Generic, Union
 
 from mediatr.exceptions import raise_if_handler_not_found, raise_if_request_none, raise_if_handler_is_invalid, raise_if_validator_is_invalid
@@ -72,6 +73,7 @@ class Mediator():
 
         raise_if_request_none(request)
         handler = None
+        validator = None
         if __handlers__.get(request.__class__):
             handler = __handlers__[request.__class__]
         elif __handlers__.get(request.__class__.__name__):
@@ -88,14 +90,14 @@ class Mediator():
         handler_obj = None
 
         handler_obj = self1.handler_class_manager(handler)
-        handler_func = handler_obj.command_handler
+        handler_func = handler_obj.handle
 
         if validator:
-            validator_func = handler_obj.validator
+            validator_func = handler_obj.validate
             validator_result = asyncio.create_task(validator_func(request))
             await validator_result
 
-        return asyncio.create_task(handler_func(request))
+        return await handler_func(request)
              
     @staticmethod
     def register_handler(handler):
@@ -120,8 +122,8 @@ class Mediator():
     @staticmethod
     def validator(validator):
         """Append handler function or class to global handlers dictionary"""
-        MyMediator.register_validator(validator)
-        return handler
+        Mediator.register_validator(validator)
+        return validator
 
 
 

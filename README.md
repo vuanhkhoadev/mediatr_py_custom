@@ -19,7 +19,7 @@ Requirements:
 
 install [mediatr](https://pypi.org/project/mediatr-ez/):
 
-`pip install mediatr`
+`pip install mediatr-ez`
 
 ### Define your request class
 
@@ -80,9 +80,9 @@ async def get_array_validator(request:GetArrayQuery):
 or class:
 
 ```py
-@Mediator.handler
+@Mediator.validator
 class GetArrayQueryValidator():
-    def handle(self,request:GetArrayQuery):
+    def validate(self,request:GetArrayQuery):
         if request.items_count > 0:
         ...etc
     else: 
