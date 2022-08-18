@@ -1,21 +1,23 @@
 # mediatr_py
 
-[![PyPI](https://img.shields.io/pypi/v/mediatr)](https://pypi.org/project/mediatr)
-[![Python](https://img.shields.io/pypi/pyversions/mediatr)](https://pypi.org/project/mediatr) 
-[![Downloads](https://img.shields.io/pypi/dm/mediatr)](https://pypi.org/project/mediatr) 
+[![PyPI](https://img.shields.io/pypi/v/mediatr-ez)](https://pypi.org/project/mediatr-ez)
+[![Python](https://img.shields.io/pypi/pyversions/mediatr-ez)](https://pypi.org/project/mediatr-ez) 
+[![Downloads](https://img.shields.io/pypi/dm/mediatr-ez)](https://pypi.org/project/mediatr-ez) 
 
-<a href="https://www.buymeacoffee.com/megafetis" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+<img src="https://ca.slack-edge.com/TEDLBFWD9-U01QFV0159R-2593823811d3-512" alt="Alt text" title="Optional title">
+
+<a href="https://www.buymeacoffee.com/khoavadevs" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 This is an async implementation of Mediator pattern with pipline behaviors.
 
 It is a port of [Mediatr](https://github.com/jbogard/MediatR) from .Net C#
 
 Requirements:
-* Python >= 3.6
+* Python >= 3.8
 
 ## Usage:
 
-install [mediatr](https://pypi.org/project/mediatr/):
+install [mediatr](https://pypi.org/project/mediatr-ez/):
 
 `pip install mediatr`
 
@@ -59,6 +61,36 @@ class GetArrayQueryHandler():
 # or just Mediator.register_handler(GetArrayQueryHandler)
 ```
 
+### Define your validator class or function
+
+```py
+import Mediator from mediatr
+
+@Mediator.validator
+async def get_array_validator(request:GetArrayQuery):
+    if request.items_count > 0:
+        ...etc
+    else: 
+        raise Exception("Sorry, items_count number below zero")
+    
+# or just Mediator.register_validator(get_array_handler)
+    
+```
+
+or class:
+
+```py
+@Mediator.handler
+class GetArrayQueryValidator():
+    def handle(self,request:GetArrayQuery):
+        if request.items_count > 0:
+        ...etc
+    else: 
+        raise Exception("Sorry, items_count number below zero")
+        
+# or just Mediator.register_validator(GetArrayQueryHandler)
+```
+
 ### Run mediator
 
 ```py
@@ -100,36 +132,11 @@ Note that instantiation of `Mediator(handler_class_manager = my_manager_func)` i
 By default class handlers are instantiated with simple init:  `SomeRequestHandler()`. handlers or behaviors as functions are executed directly. 
 
 
-## Using behaviors
-You can define behavior class with method 'handle' or function:
+## Using custom handler factory for handlers as classes
 
-```py
-@Mediator.behavior
-async def get_array_query_behavior(request:GetArrayQuery, next): #behavior only for GetArrayQuery or derived classes
-    array1 = await next()
-    array1.append(5)
-    return array1
+If your handlers registered as functions, it just executes them.
 
-@Mediator.behavior
-def common_behavior(request:object, next): #behavior for all requests because issubclass(GetArrayQuery,object)==True
-    request.timestamp = '123'
-    return next()
-
-# ...
-
-mediator = Mediator()
-request = GetArrayQuery(5)
-result = await mediator.send_async(request)
-print(result) // [0,1,2,3,4,5]
-print(request.timestamp) // '123'
-
-```
-
-## Using custom handler (behavior) factory for handlers (behaviors) as classes
-
-If your handlers or behaviors registered as functions, it just executes them.
-
-In case with handlers or behaviors, declared as classes with method `handle` Mediator uses function, that instantiates handlers or behaviors:
+In case with handlers, declared as classes with method `handle` Mediator uses function, that instantiates handlers.
 
 ```py
 def default_handler_class_manager(HandlerCls:type,is_behavior:bool=False):
