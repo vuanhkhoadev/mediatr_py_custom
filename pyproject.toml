@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mediatr-ez"
+version = "1.0.0"
+description = "Mediator project"
+readme = "README.md"
+authors = [{ name = "Anh Khoa", email = "khoava.dev@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["mediatr", "mediator", "flask-mediator", "mediator-ez"]
+dependencies = [
+    "feedparser >= 5.2.0",
+    "html2text",
+    'tomli; python_version < "3.11"',
+]
+requires-python = ">=3.8"
+
+[project.optional-dependencies]
+dev = ["black", "bumpver", "isort", "pip-tools", "pytest"]
+
+[project.urls]
+Homepage = "https://github.com/vuanhkhoadev/mediatr_py_custom"

@@ -31,17 +31,25 @@ def raise_if_handler_is_invalid(handler):
     if params_l != (1 if isfunc else 2):
         raise InvalidHandlerError(handler)
 
+def raise_if_validator_is_invalid(validator):
+    isfunc = inspect.isfunction(validator)
 
-def raise_if_behavior_is_invalid(behavior):
-    isfunc = inspect.isfunction(behavior)
-    func = behavior if isfunc else (behavior.handle if hasattr(behavior, 'handle') else None)
-    if not func or not inspect.isfunction(func):
+    func = None
+    if isfunc:
+        func = validator
+    else:
+        if hasattr(validator, 'validate'):
+            if inspect.isfunction(validator.validate):
+                func = validator.validate
+            elif inspect.ismethod(validator.validate):
+                func = validator.__class__.validate
+
+    if not func:
         raise InvalidHandlerError(func)
     sign = inspect.signature(func)
     params_l = len(sign.parameters.keys())
-    if params_l != (2 if isfunc else 3):
-        raise InvalidBehaviorError(behavior)
-
+    if params_l != (1 if isfunc else 2):
+        raise InvalidHandlerError(validator)
 
 class HandlerNotFoundError(Exception):
     def __init__(self, request):
@@ -61,10 +69,9 @@ class InvalidHandlerError(Exception):
             or must be a function with args:(request:SomeRequestType) \
              where 'request' is object of request class. See examples on git".format(handler))
 
-
-class InvalidBehaviorError(Exception):
-    def __init__(self, behavior):
-        self.behavior = behavior
-        super().__init__("Incorrect behavior: '{}'. Behavior must be a class, that contains 'handle' method with args:(self,request:SomeRequestTypeOrObject,next) \
-            or must be a function with args:(request:SomeRequestTypeOrObject,next) \
-             where 'next' is coroutine function. See examples on git".format(behavior))
+class InvalidValidatorError(Exception):
+    def __init__(self, handler):
+        self.handler = handler
+        super().__init__("Incorrect validator: '{}'. Validator must be a class, that contains 'validate' method with args:(self,request:SomeRequestType) \
+            or must be a function with args:(request:SomeRequestType) \
+             where 'request' is object of request class. See examples on git".format(handler))
